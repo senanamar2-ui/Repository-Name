@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر الفيديو الحقيقي</title>
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+    <style>
+        body { background: #1a1a1a; color: gold; text-align: center; font-family: sans-serif; }
+        .box { border: 2px solid gold; padding: 20px; margin: 10px; border-radius: 10px; }
+        input, button { margin: 10px; padding: 10px; width: 80%; }
+        #status { color: #00ff00; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>معالج الفيديو (نسخة الجوال)</h2>
+        <p id="status">انتظر تحميل المحرك...</p>
+        
+        <input type="file" id="video-in" accept="video/*">
+        <input type="file" id="logo-in" accept="image/*">
+        <button id="run-btn">بدء الدمج الحقيقي</button>
+        
+        <div id="output-area"></div>
+    </div>
+
+<script>
+    const { createFFmpeg, fetchFile } = FFmpeg;
+    const ffmpeg = createFFmpeg({ log: true });
+
+    async function start() {
+        const status = document.getElementById('status');
+        if (!ffmpeg.isLoaded()) await ffmpeg.load();
+        status.innerText = "المحرك جاهز! اختر الملفات واضغط دمج";
+    }
+    start();
+
+    document.getElementById('run-btn').onclick = async () => {
+        const vFile = document.getElementById('video-in').files[0];
+        const lFile = document.getElementById('logo-in').files[0];
+        if(!vFile || !lFile) return alert("اختر فيديو وصورة أولاً");
+
+        document.getElementById('status').innerText = "جاري المعالجة (الرندر)...";
+        
+        ffmpeg.FS('writeFile', 'video.mp4', await fetchFile(vFile));
+        ffmpeg.FS('writeFile', 'logo.png', await fetchFile(lFile));
+
+        // أمر الدمج الحقيقي
+        await ffmpeg.run('-i', 'video.mp4', '-i', 'logo.png', '-filter_complex', 'overlay=10:10', 'out.mp4');
+
+        const data = ffmpeg.FS('readFile', 'out.mp4');
+        const url = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
+        
+        document.getElementById('output-area').innerHTML = `
+            <h3>النتيجة النهائية:</h3>
+            <video src="${url}" controls style="width:100%"></video>
+            <br><a href="${url}" download="video_fixed.mp4" style="color:white">تحميل الفيديو المعدل</a>
+        `;
+        document.getElementById('status').innerText = "تمت العملية بنجاح!";
+    };
+</script>
+</body>
+</html>
