@@ -1,63 +1,262 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محرر الفيديو الحقيقي</title>
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
-    <style>
-        body { background: #1a1a1a; color: gold; text-align: center; font-family: sans-serif; }
-        .box { border: 2px solid gold; padding: 20px; margin: 10px; border-radius: 10px; }
-        input, button { margin: 10px; padding: 10px; width: 80%; }
-        #status { color: #00ff00; }
-    </style>
+<meta charset="UTF-8">
+<title>بطاقات تهنئة العيد</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap');
+body {
+    margin: 0;
+    background: radial-gradient(circle at top, #1a1a2e, #0f0f1a);
+    font-family: 'Cairo', sans-serif;
+    color: #fff;
+    text-align: center;
+    overflow-x: hidden;
+}
+.ticker {
+    background: linear-gradient(90deg, #ffd700, #ff8c00);
+    color: #000;
+    padding: 12px 0;
+    font-size: 22px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    box-shadow: 0 0 15px gold;
+}
+.ticker span {
+    display: inline-block;
+    padding-right: 100%;
+    animation: marquee 8s linear infinite;
+}
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+h1 {
+    margin-top: 30px;
+    font-size: 42px;
+    background: linear-gradient(90deg, #ffd700, #ff8c00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.container {
+    margin: 30px auto;
+    max-width: 900px;
+    position: relative;
+    z-index: 2;
+}
+input, button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    margin: 10px;
+    font-family: 'Cairo', sans-serif;
+}
+input[type="text"] {
+    width: 350px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 2px solid gold;
+}
+input[type="file"] {
+    display: none;
+}
+button {
+    background: linear-gradient(90deg, #ffd700, #ff8c00);
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px gold;
+}
+.audio-btn {
+    background: linear-gradient(90deg, #8e2de2, #4a00e0);
+    color: #fff;
+    width: 220px;
+}
+.upload-btn {
+    background: linear-gradient(90deg, #00c9ff, #92fe9d);
+    color: #000;
+}
+.card {
+    position: relative;
+    margin: 30px auto;
+    width: 600px;
+    height: 350px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(255,215,0,0.4);
+    display: none;
+}
+.card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.card-text {
+    position: absolute;
+    bottom: 40px;
+    width: 100%;
+    font-size: 28px;
+    color: #fff;
+    text-shadow: 2px 2px 10px #000;
+    animation: slideUp 1.5s ease;
+}
+@keyframes slideUp {
+    from {opacity: 0; transform: translateY(50px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+.sheep {
+    position: absolute;
+    top: 70px;
+    right: 30px;
+    font-size: 60px;
+}
+.audio-box {
+    background: rgba(255,255,255,0.05);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px auto;
+    max-width: 500px;
+}
+.audio-box h3 {
+    margin: 0 0 15px 0;
+    color: #ffd700;
+}
+.image-presets {
+    margin-top: 15px;
+}
+.image-presets button {
+    padding: 8px 15px;
+    font-size: 14px;
+    margin: 5px;
+}
+</style>
 </head>
 <body>
-    <div class="box">
-        <h2>معالج الفيديو (نسخة الجوال)</h2>
-        <p id="status">انتظر تحميل المحرك...</p>
-        
-        <input type="file" id="video-in" accept="video/*">
-        <input type="file" id="logo-in" accept="image/*">
-        <button id="run-btn">بدء الدمج الحقيقي</button>
-        
-        <div id="output-area"></div>
+<div class="ticker">
+    <span>✨ سمي مع تهنئه للعيد ✨ سمي مع تهنئه للعيد ✨ سمي مع تهنئه للعيد ✨</span>
+</div>
+<div class="sheep">🐑</div>
+<h1>عيد مبارك</h1>
+<div class="container">
+    <!-- قسم الصوت الجاهز -->
+    <div class="audio-box">
+        <h3>🎵 اختر النغمة:</h3>
+        <button class="audio-btn" onclick="playAudio('audio1')">🔊 لبيك اللهم لبيك</button>
+        <button class="audio-btn" onclick="playAudio('audio2')">🔊 من العايدين</button>
+        <br>
+        <button class="audio-btn" onclick="stopAudio()">⏹️ إيقاف الصوت</button>
     </div>
 
+    <audio id="audio1" src="https://drive.google.com/uc?export=download&id=1zvRbgCqq8o1iInkLXkpp30DFlC6QVRGp" preload="none"></audio>
+    <audio id="audio2" src="https://drive.google.com/uc?export=download&id=1T3B-8BNhYxzyT7frR1jkP9HDUmQg7HmR" preload="none"></audio>
+
+    <input type="text" id="name" placeholder="اكتب اسمك هنا" value="عمار سنان">
+    <br>
+
+    <div>
+        <p>🖼️ الصورة:</p>
+        <input type="text" id="imgUrl" placeholder="الصق رابط الصورة هنا" value="https://drive.google.com/uc?export=view&id=1tbUlTdHj4rY-QpPHdH4XTD0UimWEJdhw">
+        <br>
+        <label for="fileUpload" class="upload-btn">📱 اختر من جوالك</label>
+        <input type="file" id="fileUpload" accept="image/*">
+
+        <div class="image-presets">
+            <p style="color:#ffd700; margin:10px 0 5px;">أو اختر صورة جاهزة:</p>
+            <button onclick="setImage(0)">صورة 1</button>
+            <button onclick="setImage(1)">صورة 2</button>
+            <button onclick="setImage(2)">صورة 3</button>
+            <button onclick="setImage(3)">صورة 4</button>
+            <button onclick="setImage(4)">صورة 5</button>
+        </div>
+    </div>
+
+    <button onclick="generateCard()">اصنع بطاقتي</button>
+    <button onclick="downloadImage()">تحميل الصورة</button>
+
+    <div class="card" id="card">
+        <img id="cardImg" src="" crossorigin="anonymous">
+        <div class="card-text" id="cardText"></div>
+    </div>
+</div>
+
 <script>
-    const { createFFmpeg, fetchFile } = FFmpeg;
-    const ffmpeg = createFFmpeg({ log: true });
+const messages = [
+    "كل عام وأنت بخير {name}! عيدك مبارك",
+    "{name}، تقبل الله منا ومنكم صالح الأعمال",
+    "عيد سعيد لك {name}، ينعاد عليك بالصحة والسعادة"
+];
 
-    async function start() {
-        const status = document.getElementById('status');
-        if (!ffmpeg.isLoaded()) await ffmpeg.load();
-        status.innerText = "المحرك جاهز! اختر الملفات واضغط دمج";
+// الصور اللي أرسلتها
+const presetImages = [
+    "https://drive.google.com/uc?export=view&id=1tbUlTdHj4rY-QpPHdH4XTD0UimWEJdhw",
+    "https://drive.google.com/uc?export=view&id=12yiNInJueiOFKznOBGJdzW5peyMC0-hq",
+    "https://drive.google.com/uc?export=view&id=1-EBILs3EqaSJrfGVsQiSfeDkU_8_d4Dz",
+    "https://drive.google.com/uc?export=view&id=1gtP6ojZ3JC5pD-eNwwztDu0g64142bIb",
+    "https://drive.google.com/uc?export=view&id=1YiJt3Yoqp6TSvlwTBd_oCTY4_2RCcHUB"
+];
+
+function setImage(index) {
+    document.getElementById("imgUrl").value = presetImages[index];
+}
+
+function playAudio(id) {
+    stopAudio();
+    document.getElementById(id).play().catch(e => {
+        alert('اضغط على الصفحة أول ثم جرب التشغيل');
+    });
+}
+
+function stopAudio() {
+    document.getElementById('audio1').pause();
+    document.getElementById('audio1').currentTime = 0;
+    document.getElementById('audio2').pause();
+    document.getElementById('audio2').currentTime = 0;
+}
+
+document.getElementById('fileUpload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if(file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            document.getElementById("imgUrl").value = event.target.result;
+        }
+        reader.readAsDataURL(file);
     }
-    start();
+});
 
-    document.getElementById('run-btn').onclick = async () => {
-        const vFile = document.getElementById('video-in').files[0];
-        const lFile = document.getElementById('logo-in').files[0];
-        if(!vFile || !lFile) return alert("اختر فيديو وصورة أولاً");
+function generateCard() {
+    let name = document.getElementById("name").value || "عمار سنان";
+    let imgUrl = document.getElementById("imgUrl").value;
+    if(!imgUrl) {
+        alert("اختر صورة");
+        return;
+    }
+    let msg = messages[Math.floor(Math.random() * messages.length)].replace("{name}", name);
+    document.getElementById("cardImg").src = imgUrl;
+    document.getElementById("cardText").innerText = msg;
+    document.getElementById("card").style.display = "block";
+}
 
-        document.getElementById('status').innerText = "جاري المعالجة (الرندر)...";
-        
-        ffmpeg.FS('writeFile', 'video.mp4', await fetchFile(vFile));
-        ffmpeg.FS('writeFile', 'logo.png', await fetchFile(lFile));
-
-        // أمر الدمج الحقيقي
-        await ffmpeg.run('-i', 'video.mp4', '-i', 'logo.png', '-filter_complex', 'overlay=10:10', 'out.mp4');
-
-        const data = ffmpeg.FS('readFile', 'out.mp4');
-        const url = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
-        
-        document.getElementById('output-area').innerHTML = `
-            <h3>النتيجة النهائية:</h3>
-            <video src="${url}" controls style="width:100%"></video>
-            <br><a href="${url}" download="video_fixed.mp4" style="color:white">تحميل الفيديو المعدل</a>
-        `;
-        document.getElementById('status').innerText = "تمت العملية بنجاح!";
-    };
+function downloadImage() {
+    const card = document.getElementById("card");
+    if(card.style.display === "none") {
+        alert("اصنع البطاقة أولاً");
+        return;
+    }
+    html2canvas(card, {useCORS: true, scale: 2}).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'eid-card-ammar.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
+}
 </script>
 </body>
 </html>
